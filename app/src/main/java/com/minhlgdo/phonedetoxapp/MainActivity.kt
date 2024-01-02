@@ -1,5 +1,6 @@
 package com.minhlgdo.phonedetoxapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,7 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 
 class MainActivity : ComponentActivity() {
-    val viewModel by viewModels<MainViewModel>()
+    private val viewModel by viewModels<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +28,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainApp(viewModel)
+                    Button(onClick = {
+                        // intent to SelectAppsActivity
+                        val intent = Intent(this, SelectAppsActivity::class.java)
+                        startActivity(intent)
+                    }) {
+                        Text(text = "Hello")
+                    }
+//                    MainApp(viewModel)
                 }
             }
         }
