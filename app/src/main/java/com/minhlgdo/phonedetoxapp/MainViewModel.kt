@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import com.minhlgdo.phonedetoxapp.data.PhoneApp
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
