@@ -1,43 +1,128 @@
 package com.minhlgdo.phonedetoxapp
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.minhlgdo.phonedetoxapp.home.HomeScreen
+import com.minhlgdo.phonedetoxapp.home.JournalingScreen
+import com.minhlgdo.phonedetoxapp.home.StatisticsScreen
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 
 class MainActivity : ComponentActivity() {
-    private val viewModel by viewModels<MainViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             PhoneDetoxAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Button(onClick = {
-                        // intent to SelectAppsActivity
-                        val intent = Intent(this, SelectAppsActivity::class.java)
-                        startActivity(intent)
-                    }) {
-                        Text(text = "Hello")
-                    }
-//                    MainApp(viewModel)
-                }
+                MainScreenView()
             }
+        }
+    }
+}
+
+@Composable
+fun MainScreenView() {
+    val navController = rememberNavController()
+
+    Scaffold(
+        bottomBar = { BottomNavigationBar(navController = navController) }
+    ) {
+        // Content of the screen
+        Box(modifier = Modifier.padding(it)) {
+            NavigationGraph(navController = navController)
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar(navController: NavHostController) {
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Statistics,
+        BottomNavItem.Journaling
+    )
+    BottomNavigation (
+        modifier = Modifier.height(56.dp),
+        backgroundColor = MaterialTheme.colorScheme.primaryContainer
+    ) {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination
+        items.forEach { item ->
+            val isSelected = item.screenRoute == currentDestination?.route
+            BottomNavigationItem(
+                icon = {
+                    Icon(item.icon,
+                        contentDescription = item.title,
+                        modifier = Modifier.width(26.dp).height(26.dp))
+                },
+                label = { Text(text = item.title, fontSize = 9.sp) },
+                selected = isSelected,
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                alwaysShowLabel = false,
+                onClick = {
+                    navController.navigate(item.screenRoute) {
+                        // Pop up to the start destination of the graph to
+                        // avoid building up a large stack of destinations
+                        // on the back stack as users select items
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+
+}
+
+sealed class BottomNavItem(val title: String, val icon: ImageVector, val screenRoute: String) {
+    object Home : BottomNavItem("Home", Icons.Filled.Home, "Home")
+    object Statistics : BottomNavItem("Statistics", Icons.Filled.Info, "Statistics")
+    object Journaling : BottomNavItem("Journaling", Icons.Filled.Create, "Journaling")
+}
+
+@Composable
+fun NavigationGraph(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = "Home") {
+        composable("Home") {
+            HomeScreen()
+        }
+        composable("Statistics") {
+            StatisticsScreen()
+        }
+        composable("Journaling") {
+            JournalingScreen()
         }
     }
 }

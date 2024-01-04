@@ -78,7 +78,6 @@ class SelectAppsViewModel(application: Application) : AndroidViewModel(applicati
         return appList
     }
 
-
     fun onAppSelected(app: PhoneApp, isSelected: Boolean) {
         if (isSelected) {
             _unselectedApps.remove(app)

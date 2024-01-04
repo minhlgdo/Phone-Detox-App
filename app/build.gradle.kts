@@ -58,6 +58,11 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
 
+    // Navigation
+    val navVersion = "2.7.6"
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+    implementation("androidx.compose.material:material:1.5.4")
+
     // Accompanist for loading images
     implementation("com.google.accompanist:accompanist-drawablepainter:0.28.0")
 

@@ -2,7 +2,7 @@
  A project that replicates the one-sec app, which helps people reduce their phone usage by asking them to select apps that they want to block and when they try to open them, they will be asked to wait for a second to think about whether they really want to open the app or not. If not, they do journaling instead.
 
 ## Tasks
-- [ ] Main screen UI
+- [x] Main screen UI: 3 tabs: Home, Statistics, Journaling
 - [x] Select blocked apps and store them in a local database
   - [x] UI for selecting apps
   - [x] Save the selected apps in a local database

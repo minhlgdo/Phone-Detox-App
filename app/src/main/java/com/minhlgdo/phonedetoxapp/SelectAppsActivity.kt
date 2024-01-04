@@ -67,6 +67,7 @@ class SelectAppsActivity : ComponentActivity() {
                 LaunchedEffect(true) {
                     apps = viewModel.getPhoneApps()
                 }
+
                 Scaffold(
                     snackbarHost = {
                         SnackbarHost(hostState = snackbarHostState)
@@ -82,7 +83,8 @@ class SelectAppsActivity : ComponentActivity() {
                                 }
                             }
                         )
-                    }, floatingActionButton = {
+                    },
+                    floatingActionButton = {
                         ExtendedFloatingActionButton(
                             text = { Text(text = "Save blocked apps") },
                             onClick = {
@@ -98,14 +100,17 @@ class SelectAppsActivity : ComponentActivity() {
                             icon = { Icon(Icons.Filled.Done, "Done") },
                             shape = MaterialTheme.shapes.medium
                         )
-                    }, content = { paddingValues ->
+                    },
+                    content = { paddingValues ->
                         if (viewModel.isAppLoaded) {
                             AppList(apps = apps, padding = paddingValues)
                         } else {
                             // a circular loading indicator
-                            Box(modifier = Modifier
-                                .fillMaxSize()
-                                .padding(paddingValues)) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(paddingValues)
+                            ) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.align(Alignment.Center)
                                 )
@@ -120,9 +125,11 @@ class SelectAppsActivity : ComponentActivity() {
 
     @Composable
     fun AppList(apps: List<PhoneApp>, padding: PaddingValues) {
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(padding)
+        ) {
             LazyColumn(
                 content = {
                     items(apps.size) { index ->
@@ -134,9 +141,8 @@ class SelectAppsActivity : ComponentActivity() {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-//                            Log.d("SelectAppsActivity", "AppList: ${app.getName()}")
                             val isChecked = remember { mutableStateOf(app.isBlocked()) }
-                            // insert app icon here
+                            // display app icon, name and checkbox
                             Image(
                                 painter = rememberDrawablePainter(drawable = app.getIcon()),
                                 contentDescription = "App icon",
