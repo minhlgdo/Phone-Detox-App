@@ -66,6 +66,14 @@ dependencies {
     // Accompanist for loading images
     implementation("com.google.accompanist:accompanist-drawablepainter:0.28.0")
 
+    // Permissions
+    val permissionVersion = "0.33.2-alpha"
+    implementation("com.google.accompanist:accompanist-permissions:$permissionVersion")
+
+    // WorkManager
+    val workVersion = "2.9.0"
+    implementation("androidx.work:work-runtime-ktx:$workVersion")
+
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.1")

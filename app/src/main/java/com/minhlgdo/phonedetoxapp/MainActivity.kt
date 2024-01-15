@@ -1,129 +1,73 @@
 package com.minhlgdo.phonedetoxapp
 
+import android.app.AppOpsManager
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.minhlgdo.phonedetoxapp.home.HomeScreen
-import com.minhlgdo.phonedetoxapp.home.JournalingScreen
-import com.minhlgdo.phonedetoxapp.home.StatisticsScreen
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
+import com.minhlgdo.phonedetoxapp.home.MainScreenView
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 
 class MainActivity : ComponentActivity() {
+    private var usagePermission by mutableStateOf(false)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Ask for permission to show notification
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.FOREGROUND_SERVICE,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ),
+                0
+            )
+        }
+
+        // Start background service
+        startService(Intent(this, AppMonitoringService::class.java))
 
         setContent {
             PhoneDetoxAppTheme {
-                MainScreenView()
+                LaunchedEffect(Unit) {
+                    usagePermission = hasUsageStatsPermission()
+                }
+                MainScreenView(usagePermission)
             }
         }
     }
-}
 
-@Composable
-fun MainScreenView() {
-    val navController = rememberNavController()
-
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController = navController) }
-    ) {
-        // Content of the screen
-        Box(modifier = Modifier.padding(it)) {
-            NavigationGraph(navController = navController)
-        }
+    override fun onResume() {
+        super.onResume()
+        // Check if the usage access permission has been granted
+        usagePermission = hasUsageStatsPermission()
     }
-}
 
-@Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Statistics,
-        BottomNavItem.Journaling
-    )
-    BottomNavigation (
-        modifier = Modifier.height(56.dp),
-        backgroundColor = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-        items.forEach { item ->
-            val isSelected = item.screenRoute == currentDestination?.route
-            BottomNavigationItem(
-                icon = {
-                    Icon(item.icon,
-                        contentDescription = item.title,
-                        modifier = Modifier.width(26.dp).height(26.dp))
-                },
-                label = { Text(text = item.title, fontSize = 9.sp) },
-                selected = isSelected,
-                selectedContentColor = MaterialTheme.colorScheme.primary,
-                unselectedContentColor = MaterialTheme.colorScheme.onBackground,
-                alwaysShowLabel = false,
-                onClick = {
-                    navController.navigate(item.screenRoute) {
-                        // Pop up to the start destination of the graph to
-                        // avoid building up a large stack of destinations
-                        // on the back stack as users select items
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
-                }
+
+    /*
+    Check if the app has the usage stats permission (special permissions => cannot use AndroidX's Permission API)
+     */
+    private fun hasUsageStatsPermission(): Boolean {
+        val appOps = getSystemService(APP_OPS_SERVICE) as AppOpsManager
+        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            appOps.unsafeCheckOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), packageName
+            )
+        } else {
+            appOps.checkOpNoThrow(
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), packageName
             )
         }
-    }
-
-}
-
-sealed class BottomNavItem(val title: String, val icon: ImageVector, val screenRoute: String) {
-    object Home : BottomNavItem("Home", Icons.Filled.Home, "Home")
-    object Statistics : BottomNavItem("Statistics", Icons.Filled.Info, "Statistics")
-    object Journaling : BottomNavItem("Journaling", Icons.Filled.Create, "Journaling")
-}
-
-@Composable
-fun NavigationGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "Home") {
-        composable("Home") {
-            HomeScreen()
-        }
-        composable("Statistics") {
-            StatisticsScreen()
-        }
-        composable("Journaling") {
-            JournalingScreen()
-        }
+        return mode == AppOpsManager.MODE_ALLOWED
     }
 }
+
 
