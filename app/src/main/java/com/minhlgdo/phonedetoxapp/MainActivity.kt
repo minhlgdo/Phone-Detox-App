@@ -1,6 +1,7 @@
 package com.minhlgdo.phonedetoxapp
 
 import android.app.AppOpsManager
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -30,7 +31,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // Start background service
-//        startService(Intent(this, AppMonitoringService::class.java))
+        startService(Intent(this, AppMonitoringService::class.java))
 
         setContent {
             PhoneDetoxAppTheme {
