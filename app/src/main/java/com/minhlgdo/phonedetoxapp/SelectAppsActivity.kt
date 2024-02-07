@@ -7,7 +7,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
 import com.minhlgdo.phonedetoxapp.ui.presentation.select_apps.SelectAppsScreen
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
-import com.minhlgdo.phonedetoxapp.view_model.SelectAppsViewModel
+import com.minhlgdo.phonedetoxapp.view_models.SelectAppsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

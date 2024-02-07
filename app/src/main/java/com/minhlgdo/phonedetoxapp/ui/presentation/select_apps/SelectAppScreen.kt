@@ -13,19 +13,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.minhlgdo.phonedetoxapp.view_model.SelectAppsViewModel
+import com.minhlgdo.phonedetoxapp.view_models.SelectAppsViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,13 +41,25 @@ fun SelectAppsScreen(
 ) {
 //    var apps by remember { mutableStateOf(emptyList<PhoneApp>()) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var prevSavedState by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
 
-//    // Load apps from the phone when the screen is created
-//    LaunchedEffect(true) {
-//        apps = viewModel.getPhoneApps(context)
-//    }
+    LaunchedEffect(true) {
+        println("uiState.saved: ${uiState.saved}")
+        viewModel.uiState.collect {
+            if (it.saved && prevSavedState != it.saved) {
+                val job = launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Saved",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                delay(750)
+                job.cancel()
+            }
+            prevSavedState = it.saved
+        }
+    }
 
     Scaffold (
         snackbarHost = {
@@ -64,6 +82,10 @@ fun SelectAppsScreen(
                 text = { Text(text = "Save blocked apps") },
                 onClick = {
                           viewModel.onSaveApps()
+
+
+                    // snackbar to notify user that the apps are saved
+
 //                    lifecycleScope.launch {
 //                        viewModel.saveBlockedApps()
 //                        // Snackbar to notify user that the apps are saved

@@ -32,7 +32,6 @@ Monitoring the foreground app and appearing a full screen overlay if the foregro
 class AppMonitoringService : Service() {
     @Inject lateinit var phoneAppRepository: PhoneAppRepository
 
-//    private lateinit var prevForegroundApp: String
     private lateinit var currForegroundApp: String
     private var blockedApps : List<String>? = null
     private var job: Job? = null

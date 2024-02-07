@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.view_model
+package com.minhlgdo.phonedetoxapp.view_models
 
 import android.content.Context
 import android.content.Intent
@@ -57,6 +57,11 @@ class SelectAppsViewModel @Inject constructor(
             for (app in uiState.value.unselected) {
                 repository.deleteBlockedApps(app.toEntity())
             }
+            _uiState.update { currentState -> currentState.copy(
+                saved = true,
+                selected = emptyList(),
+                unselected = emptyList()
+            ) }
         }
     }
 
@@ -64,6 +69,7 @@ class SelectAppsViewModel @Inject constructor(
         if (isSelected) {
             _uiState.update { currentState ->
                 currentState.copy(
+                    saved = false,
                     selected = currentState.selected + app,
                     unselected = currentState.unselected - app
                 )
@@ -71,6 +77,7 @@ class SelectAppsViewModel @Inject constructor(
         } else {
             _uiState.update { currentState ->
                 currentState.copy(
+                    saved = false,
                     selected = currentState.selected - app,
                     unselected = currentState.unselected + app
                 )
