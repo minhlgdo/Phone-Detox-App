@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.data
+package com.minhlgdo.phonedetoxapp.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class PhoneAppEntity(
     val name: String,
     @PrimaryKey val packageName: String,
-    val isBlocked: Boolean = false
+    val isBlocked: Boolean = true
 )

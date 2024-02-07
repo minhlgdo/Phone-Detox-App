@@ -5,7 +5,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -13,7 +15,7 @@ class MainApp : Application() {
             val notificationChannel = NotificationChannel(
                 "default",
                 "App Notification",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_LOW
             )
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(notificationChannel)

@@ -1,10 +1,12 @@
-package com.minhlgdo.phonedetoxapp.data
+package com.minhlgdo.phonedetoxapp.data.local
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PhoneAppDao {
@@ -14,6 +16,7 @@ interface PhoneAppDao {
     @Delete
     suspend fun deleteBlockedApps(phoneApp: PhoneAppEntity)
 
+    // Using Flow to observe changes in the database
     @Query("SELECT * FROM phoneappentity")
-    suspend fun getBlockedApps(): List<PhoneAppEntity>
+    fun getBlockedApps(): Flow<List<PhoneAppEntity>>
 }

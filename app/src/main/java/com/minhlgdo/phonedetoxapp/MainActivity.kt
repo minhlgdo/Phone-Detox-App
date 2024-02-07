@@ -1,7 +1,6 @@
 package com.minhlgdo.phonedetoxapp
 
 import android.app.AppOpsManager
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
-import com.minhlgdo.phonedetoxapp.home.MainScreenView
+import com.minhlgdo.phonedetoxapp.ui.presentation.home.MainScreenView
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -31,7 +30,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // Start background service
-        startService(Intent(this, AppMonitoringService::class.java))
+//        startService(Intent(this, AppMonitoringService::class.java))
 
         setContent {
             PhoneDetoxAppTheme {

@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.home
+package com.minhlgdo.phonedetoxapp.ui.presentation.home
 
 import android.content.Context
 import android.content.Intent

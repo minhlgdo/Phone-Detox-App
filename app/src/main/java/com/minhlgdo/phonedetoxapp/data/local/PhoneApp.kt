@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.data
+package com.minhlgdo.phonedetoxapp.data.local
 
 import android.graphics.drawable.Drawable
 
