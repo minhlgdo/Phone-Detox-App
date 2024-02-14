@@ -4,12 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -19,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,11 +23,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -43,12 +35,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun MainScreenView(hasUsagePermission: Boolean) {
+fun MainScreenView(hasUsagePermission: Boolean, hasPopupPermission: Boolean) {
     val context = LocalContext.current
-
     val navController = rememberNavController()
 
-    if (hasUsagePermission) {
+    if (hasUsagePermission && hasPopupPermission) {
         Scaffold(
             bottomBar = { BottomNavigationBar(navController = navController) }
         ) {
@@ -58,33 +49,9 @@ fun MainScreenView(hasUsagePermission: Boolean) {
             }
         }
     } else {
-        RequestPermissionsUI(context)
+        RequestPermissionsUI(context, hasUsagePermission, hasPopupPermission)
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun RequestPermissionsUI(context: Context) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Phone Detox App") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            )
-        }
-    ) {
-        OpenSettingsContent(it) {
-//                    permissionState.launchMultiplePermissionRequest()
-            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            val uri: Uri = Uri.fromParts("package", context.packageName, null)
-            intent.data = uri
-            context.startActivity(intent)
-        }
-    }
-
-}
-
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -158,27 +125,5 @@ fun NavigationGraph(navController: NavHostController) {
     }
 }
 
-/**
- * The open settings composable is used to display a message to the user changing the permissions
- */
-@Composable
-private fun OpenSettingsContent(paddingValues: PaddingValues, onOpenSettingsClicked: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Please open app settings to grant necessary permissions.",
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(16.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { onOpenSettingsClicked() }) {
-            Text("Open Settings")
-        }
-    }
-}
+
 

@@ -28,10 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.minhlgdo.phonedetoxapp.view_models.SelectAppsViewModel
+import com.minhlgdo.phonedetoxapp.viewmodels.SelectAppsViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,23 +43,21 @@ fun SelectAppsScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(true) {
-        println("uiState.saved: ${uiState.saved}")
+        // Show a snackbar when the apps are saved
         viewModel.uiState.collect {
-            if (it.saved && prevSavedState != it.saved) {
-                val job = launch {
-                    snackbarHostState.showSnackbar(
-                        message = "Saved",
-                        duration = SnackbarDuration.Short
-                    )
-                }
+            if (it.saved && !prevSavedState) {
+                snackbarHostState.showSnackbar(
+                    message = "Saved",
+                    duration = SnackbarDuration.Short,
+                    withDismissAction = true
+                )
                 delay(750)
-                job.cancel()
             }
             prevSavedState = it.saved
         }
     }
 
-    Scaffold (
+    Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -81,19 +77,7 @@ fun SelectAppsScreen(
             ExtendedFloatingActionButton(
                 text = { Text(text = "Save blocked apps") },
                 onClick = {
-                          viewModel.onSaveApps()
-
-
-                    // snackbar to notify user that the apps are saved
-
-//                    lifecycleScope.launch {
-//                        viewModel.saveBlockedApps()
-//                        // Snackbar to notify user that the apps are saved
-//                        snackbarHostState.showSnackbar(
-//                            message = "Saved",
-//                            duration = SnackbarDuration.Short
-//                        )
-//                    }
+                    viewModel.onSaveApps()
                 },
                 icon = { Icon(Icons.Filled.Done, "Done") },
                 shape = MaterialTheme.shapes.medium

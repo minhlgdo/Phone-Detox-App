@@ -5,13 +5,20 @@ import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.PixelFormat
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.view.Gravity
+import android.view.WindowManager
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import com.minhlgdo.phonedetoxapp.data.local.PhoneAppDatabase
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
+import com.minhlgdo.phonedetoxapp.ui.presentation.overlay.OverlayScreen
+import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,17 +42,24 @@ class AppMonitoringService : Service() {
     private lateinit var currForegroundApp: String
     private var blockedApps : List<String>? = null
     private var job: Job? = null
+    private var mWindowManager: WindowManager? = null
 
     override fun onCreate() {
         super.onCreate()
+        mWindowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         // Initialize and start the timer
         val timer = Timer()
         timer.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 checkForegroundApp()
+                blockedApps?.let {
+                    if (isBlockedApp()) {
+                        showOverlay()
+                    }
+                }
             }
-        }, 0, 2000) // Check every second (adjust as needed)
+        }, 0, 1500) // Check every second (adjust as needed)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -69,12 +83,6 @@ class AppMonitoringService : Service() {
                 if (event.packageName != currForegroundApp) {
                     println("Foreground app changed: ${event.packageName}")
                     currForegroundApp = event.packageName
-
-                    blockedApps?.let {
-                        if (isBlockedApp()) {
-                            showOverlay()
-                        }
-                    }
                 }
 
             }
@@ -86,7 +94,9 @@ class AppMonitoringService : Service() {
     }
 
     private fun showOverlay() {
-
+        val intent = Intent(this, OverlayActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+        startActivity(intent)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

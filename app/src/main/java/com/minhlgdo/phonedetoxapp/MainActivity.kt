@@ -4,6 +4,7 @@ import android.app.AppOpsManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
@@ -16,6 +17,8 @@ import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 
 class MainActivity : ComponentActivity() {
     private var usagePermission by mutableStateOf(false)
+    private var drawOverAppPermission by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Ask for permission to show notification
@@ -30,23 +33,25 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        // Start background service
-        startService(Intent(this, AppMonitoringService::class.java))
-
         setContent {
             PhoneDetoxAppTheme {
                 LaunchedEffect(Unit) {
                     usagePermission = hasUsageStatsPermission()
+                    drawOverAppPermission = hasDrawOverAppPermission()
                 }
-                MainScreenView(usagePermission)
+                MainScreenView(usagePermission, drawOverAppPermission)
             }
         }
+
+        // Start background service
+        startService(Intent(this, AppMonitoringService::class.java))
     }
 
     override fun onResume() {
         super.onResume()
         // Check if the usage access permission has been granted
         usagePermission = hasUsageStatsPermission()
+        drawOverAppPermission = hasDrawOverAppPermission()
     }
 
 
@@ -67,6 +72,11 @@ class MainActivity : ComponentActivity() {
             )
         }
         return mode == AppOpsManager.MODE_ALLOWED
+    }
+
+    // Check if the app has the overlay permission
+    private fun hasDrawOverAppPermission(): Boolean {
+        return Settings.canDrawOverlays(this)
     }
 }
 

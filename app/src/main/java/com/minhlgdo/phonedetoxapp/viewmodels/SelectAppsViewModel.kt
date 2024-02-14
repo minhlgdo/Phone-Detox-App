@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.view_models
+package com.minhlgdo.phonedetoxapp.viewmodels
 
 import android.content.Context
 import android.content.Intent
