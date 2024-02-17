@@ -1,6 +1,7 @@
 package com.minhlgdo.phonedetoxapp.data.local
 
 import android.graphics.drawable.Drawable
+import com.minhlgdo.phonedetoxapp.data.local.model.BlockedAppEntity
 
 data class PhoneApp(
     private val name: String,
@@ -29,7 +30,7 @@ data class PhoneApp(
         isBlocked = blocked
     }
 
-    fun toEntity(): PhoneAppEntity {
-        return PhoneAppEntity(name, packageName, isBlocked)
+    fun toEntity(): BlockedAppEntity {
+        return BlockedAppEntity(name, packageName, isBlocked)
     }
 }

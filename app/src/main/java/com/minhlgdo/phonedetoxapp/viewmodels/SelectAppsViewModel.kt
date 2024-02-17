@@ -10,7 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhlgdo.phonedetoxapp.data.local.PhoneApp
-import com.minhlgdo.phonedetoxapp.data.local.PhoneAppEntity
+import com.minhlgdo.phonedetoxapp.data.local.model.BlockedAppEntity
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
 import com.minhlgdo.phonedetoxapp.ui.state.SelectAppsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +38,7 @@ class SelectAppsViewModel @Inject constructor(
     var phoneApps: List<PhoneApp> by mutableStateOf(emptyList())
         private set
 
-    private var blockedApps: List<PhoneAppEntity> by mutableStateOf(emptyList())
+    private var blockedApps: List<BlockedAppEntity> by mutableStateOf(emptyList())
 
 
     init {

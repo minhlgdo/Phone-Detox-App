@@ -22,7 +22,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAppRepository(db: PhoneAppDatabase) : PhoneAppRepository {
-        return PhoneAppRepository(db.dao)
+        return PhoneAppRepository(db.appDao, db.usageDao)
     }
 
 

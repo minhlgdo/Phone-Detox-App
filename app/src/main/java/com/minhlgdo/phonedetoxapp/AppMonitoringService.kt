@@ -42,11 +42,9 @@ class AppMonitoringService : Service() {
     private lateinit var currForegroundApp: String
     private var blockedApps : List<String>? = null
     private var job: Job? = null
-    private var mWindowManager: WindowManager? = null
 
     override fun onCreate() {
         super.onCreate()
-        mWindowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         // Initialize and start the timer
         val timer = Timer()
@@ -80,7 +78,7 @@ class AppMonitoringService : Service() {
                     currForegroundApp = event.packageName
                 }
 //                println("Current foreground app: ${event.packageName}, currForegroundApp: $currForegroundApp")
-                if (event.packageName != currForegroundApp) {
+                if ((event.packageName != currForegroundApp) && (event.packageName != "com.minhlgdo.phonedetoxapp")) {
                     println("Foreground app changed: ${event.packageName}")
                     currForegroundApp = event.packageName
                 }
@@ -90,12 +88,13 @@ class AppMonitoringService : Service() {
     }
 
     private fun isBlockedApp(): Boolean {
-        return blockedApps!!.contains(currForegroundApp)
+        return this::currForegroundApp.isInitialized && blockedApps!!.contains(currForegroundApp)
     }
 
     private fun showOverlay() {
         val intent = Intent(this, OverlayActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+        intent.putExtra("currentApp", currForegroundApp)
         startActivity(intent)
     }
 
