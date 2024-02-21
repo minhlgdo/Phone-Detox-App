@@ -19,4 +19,7 @@ interface BlockedAppDao {
     // Using Flow to observe changes in the database
     @Query("SELECT * FROM blockedappentity")
     fun getBlockedApps(): Flow<List<BlockedAppEntity>>
+
+    @Query("SELECT name FROM blockedappentity WHERE packageName = :packageName")
+    fun getAppName(packageName: String): Flow<String>
 }

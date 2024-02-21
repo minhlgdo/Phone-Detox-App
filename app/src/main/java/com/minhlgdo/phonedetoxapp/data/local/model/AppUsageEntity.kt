@@ -11,7 +11,7 @@ import java.text.DateFormat
 import java.time.format.DateTimeFormatter
 import java.util.Date
 
-@Entity
+@Entity(tableName = "usage_table")
 data class AppUsageEntity (
     @PrimaryKey(autoGenerate = true) val id: Int,
     var packageName: String,

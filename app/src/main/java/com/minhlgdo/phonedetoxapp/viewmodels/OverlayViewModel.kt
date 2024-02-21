@@ -1,49 +1,166 @@
 package com.minhlgdo.phonedetoxapp.viewmodels
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.minhlgdo.phonedetoxapp.data.local.model.AppUsageEntity
+import com.minhlgdo.phonedetoxapp.data.local.model.JournalEntity
+import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
+import com.minhlgdo.phonedetoxapp.ui.presentation.overlay.OverlayEvent
+import com.minhlgdo.phonedetoxapp.ui.state.OverlayUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.first
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
 class OverlayViewModel @Inject constructor(
-    private val repository: PhoneAppRepository,
-    savedStateHandle: SavedStateHandle
+    private val phoneRepo: PhoneAppRepository,
+    private val journalRepo: JournalRepository,
+    savedStateHandle: SavedStateHandle,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
-    private val _currForegroundApp = savedStateHandle.getLiveData<String>("currentApp")
-
+    private val _currForegroundApp = savedStateHandle.getLiveData<String>("currentAppPackage")
     private val currForegroundApp: String
         get() = _currForegroundApp.value ?: ""
+
+    private val todaysJournalCount = MutableStateFlow(0)
+
+    private val _uiState =
+        MutableStateFlow(OverlayUiState()) // can be used to observe the state of the UI in the ViewModel only
+    val uiState: StateFlow<OverlayUiState> = _uiState.asStateFlow()
 
     init {
         println("OverlayViewModel initialized, current app: $currForegroundApp")
         runBlocking {
-            updateAppUsage()
+            getAppName()
             getAppUsage()
+            getJournalCount()
         }
     }
 
-    private suspend fun updateAppUsage() {
-        // Update the app usage
-        repository.updateAppUsage(AppUsageEntity(currForegroundApp))
-        println("App usage updated")
+    private fun getAppName() {
+        if (currForegroundApp.isEmpty()) return
+        viewModelScope.launch {
+            val name = phoneRepo.getBlockedAppName(currForegroundApp)
+            _uiState.update { currentState ->
+                currentState.copy(
+                    appName = name
+                )
+            }
+        }
     }
 
     private suspend fun getAppUsage() {
+        // Update the app usage
         if (currForegroundApp.isEmpty()) return
-        val count = repository.getTodayUsage(currForegroundApp)
-        println("App usage count: ${count.first()}")
+        phoneRepo.updateAppUsage(AppUsageEntity(currForegroundApp))
+        println("App usage updated")
+
+        // Get the app usage
+        val count = phoneRepo.getTodayUsage(currForegroundApp)
+//        println("App usage: $count")
+        _uiState.update { currentState ->
+            currentState.copy(
+                accessCount = count
+            )
+        }
     }
 
-    fun dismissOverlay() {
-        // Dismiss the overlay
+    private fun getJournalCount() {
+        viewModelScope.launch {
+            val count = journalRepo.getJournalTodayCount()
+            println("Journal count: $count")
+            todaysJournalCount.value = count
+        }
     }
 
-    fun enterApp() {
-        // Enter the app
+    fun onEvent(event: OverlayEvent) {
+        when (event) {
+            is OverlayEvent.SetJournalTitle -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        journalTitle = event.title
+                    )
+                }
+            }
+
+            is OverlayEvent.SetJournalContent -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        journalContent = event.content
+                    )
+                }
+            }
+
+            is OverlayEvent.ShowJournalPopup -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        journalPopup = true
+                    )
+                }
+            }
+
+            is OverlayEvent.HideJournalPopup -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        journalPopup = false
+                    )
+                }
+            }
+
+            is OverlayEvent.SaveJournal -> {
+                saveJournal()
+            }
+
+            is OverlayEvent.EnterBlockedApp -> {
+                enterApp()
+            }
+
+            is OverlayEvent.NotEnterApp -> {
+                // Go back to the phone's home screen
+                returnHome()
+            }
+
+        }
+    }
+
+    private fun saveJournal() {
+        viewModelScope.launch {
+            val title = _uiState.value.journalTitle
+            val content = _uiState.value.journalContent
+            if (title.isEmpty() || content.isEmpty()) return@launch
+            journalRepo.insertJournal(JournalEntity(title, content))
+            _uiState.update { currentState ->
+                currentState.copy(
+                    journalPopup = false,
+                    journalTitle = "",
+                    journalContent = ""
+                )
+            }
+        }
+//        returnHome()
+    }
+
+    private fun returnHome() {
+        // Go back to the phone's home screen
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        context.startActivity(intent)
+    }
+
+    // Method to enter the blocked app
+    private fun enterApp() {
+        // Enter the previous app
+
     }
 }

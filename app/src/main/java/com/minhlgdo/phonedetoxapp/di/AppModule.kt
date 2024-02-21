@@ -2,6 +2,7 @@ package com.minhlgdo.phonedetoxapp.di
 
 import android.content.Context
 import com.minhlgdo.phonedetoxapp.data.local.PhoneAppDatabase
+import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
 import dagger.Module
 import dagger.Provides
@@ -23,6 +24,12 @@ object AppModule {
     @Singleton
     fun provideAppRepository(db: PhoneAppDatabase) : PhoneAppRepository {
         return PhoneAppRepository(db.appDao, db.usageDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideJournalRepository(db: PhoneAppDatabase) : JournalRepository {
+        return JournalRepository(db.journalDao)
     }
 
 

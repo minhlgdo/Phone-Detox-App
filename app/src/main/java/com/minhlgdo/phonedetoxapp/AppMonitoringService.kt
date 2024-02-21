@@ -94,7 +94,7 @@ class AppMonitoringService : Service() {
     private fun showOverlay() {
         val intent = Intent(this, OverlayActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-        intent.putExtra("currentApp", currForegroundApp)
+        intent.putExtra("currentAppPackage", currForegroundApp)
         startActivity(intent)
     }
 

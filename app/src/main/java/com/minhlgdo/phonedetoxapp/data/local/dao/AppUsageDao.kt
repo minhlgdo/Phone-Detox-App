@@ -15,6 +15,6 @@ interface AppUsageDao {
 //    @Query("SELECT DATE_FORMAT(time, '%Y/%m/%d') as date, COUNT(time) AS count FROM appusageentity WHERE name = :app AND WEEK(time) = :day GROUP BY DATE_FORMAT(time, '%Y/%m/%d')  ORDER BY time")
 //    fun getAppUsageWeeklyCount(app: String, day: String): Flow<List<AppUsageResult>>
 
-    @Query("SELECT COUNT(DISTINCT time) FROM appusageentity WHERE packageName = :app AND DATE(time) = DATE('now')")
-    fun getAppUsageTodayCount(app: String): Flow<Int>
+    @Query("SELECT COUNT(time) FROM usage_table WHERE packageName = :app AND DATE(time) = DATE(:date)")
+    fun getAppUsageTodayCount(app: String, date: String): Flow<Int>
 }
