@@ -1,7 +1,5 @@
 package com.minhlgdo.phonedetoxapp.data.repository
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.minhlgdo.phonedetoxapp.data.local.dao.JournalDao
 import com.minhlgdo.phonedetoxapp.data.local.model.JournalEntity
 import kotlinx.coroutines.flow.firstOrNull
@@ -15,6 +13,10 @@ class JournalRepository @Inject constructor(
 ){
     suspend fun insertJournal(journal: JournalEntity) {
         journalDao.insertJournal(journal)
+    }
+
+    suspend fun deleteJournal(journal: JournalEntity) {
+        journalDao.deleteJournal(journal)
     }
 
     suspend fun getJournalTodayCount() : Int {

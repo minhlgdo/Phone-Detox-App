@@ -7,10 +7,10 @@
   - [x] UI for selecting apps
   - [x] Save the selected apps in a local database
   - [x] Retrieve the selected apps from the database and show them in the UI
-- [ ] Detect when a blocked app is opened - using Foreground Service + WorkerMananger
+- [x] Detect when a blocked app is opened - using Foreground Service
     - [x] Detect when a blocked app is opened
     - [x] Show UI asking the user to wait for a second or do journaling
-    - [ ] If the user wants to open the app, open the app and increase the number of times the user opened the app
+    - [x] If the user wants to open the app, open the app and increase the number of times the user opened the app
 - [ ] Statistics tab: how many times the user opened the blocked apps in a day, week, month, year
 - [ ] Journaling feature: 
     - [ ] Add a journal

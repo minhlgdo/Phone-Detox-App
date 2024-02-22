@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.minhlgdo.phonedetoxapp.data.local.ServiceManager
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ Monitoring the foreground app and appearing a full screen overlay if the foregro
 @AndroidEntryPoint
 class AppMonitoringService : Service() {
     @Inject lateinit var phoneAppRepository: PhoneAppRepository
+    @Inject lateinit var serviceManager: ServiceManager
 
     private lateinit var currForegroundApp: String
     private var blockedApps : List<String>? = null
@@ -45,7 +47,7 @@ class AppMonitoringService : Service() {
                     }
                 }
             }
-        }, 0, 1500) // Check every second (adjust as needed)
+        }, 0, 1000) // Check every second (adjust as needed)
     }
 
     override fun onBind(intent: Intent?): IBinder {
@@ -100,9 +102,18 @@ class AppMonitoringService : Service() {
             phoneAppRepository.getBlockedApps().collect { newData ->
                 blockedApps = newData.map { it.packageName }
             }
+            serviceManager.setIsRunning(true)
         }
 
         return START_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        CoroutineScope(Dispatchers.Main).launch {
+            serviceManager.setIsRunning(false)
+        }
+        job?.cancel()
     }
 
     // Binder given to other clients
@@ -114,6 +125,5 @@ class AppMonitoringService : Service() {
     // Public method for clients to modify isBlockedAppOpen
     fun setAppOpen(isOpen: Boolean) {
         allowsAppOpen = isOpen
-        println("allowsAppOpen: $allowsAppOpen")
     }
 }

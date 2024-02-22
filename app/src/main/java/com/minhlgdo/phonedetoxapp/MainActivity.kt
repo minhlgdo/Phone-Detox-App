@@ -8,21 +8,33 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.minhlgdo.phonedetoxapp.data.local.ServiceManager
 import com.minhlgdo.phonedetoxapp.ui.home.MainScreenView
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var serviceManager: ServiceManager
     private var usagePermission by mutableStateOf(false)
     private var drawOverAppPermission by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         // Ask for permission to show notification
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
@@ -45,8 +57,20 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                serviceManager.getIsRunning.collect { isRunning ->
+                    if (!isRunning) {
+                        startService(Intent(this@MainActivity, AppMonitoringService::class.java))
+                    }
+                }
+            }
+        }
+
+
+
         // Start background service
-        startService(Intent(this, AppMonitoringService::class.java))
+//        startService(Intent(this, AppMonitoringService::class.java))
     }
 
     override fun onResume() {
@@ -83,7 +107,6 @@ class MainActivity : ComponentActivity() {
 
     private fun serviceIsRunning(): Boolean {
         val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        val services = activityManager.getRunningServices(Int.MAX_VALUE)
         return false
     }
 }

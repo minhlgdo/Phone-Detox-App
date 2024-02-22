@@ -53,7 +53,7 @@ android {
 
 dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     // Room
     val roomVersion = "2.6.1"
@@ -69,6 +69,10 @@ dependencies {
 
     // Accompanist for loading images
     implementation("com.google.accompanist:accompanist-drawablepainter:0.28.0")
+
+    // DataStore
+    val dataStoreVersion = "1.0.0"
+    implementation("androidx.datastore:datastore-preferences:$dataStoreVersion")
 
     // Permissions
     val permissionVersion = "0.33.2-alpha"
