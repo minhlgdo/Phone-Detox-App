@@ -2,6 +2,7 @@ package com.minhlgdo.phonedetoxapp.viewmodels
 
 import android.content.Context
 import android.content.Intent
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,8 +10,8 @@ import com.minhlgdo.phonedetoxapp.data.local.model.AppUsageEntity
 import com.minhlgdo.phonedetoxapp.data.local.model.JournalEntity
 import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
-import com.minhlgdo.phonedetoxapp.ui.presentation.overlay.OverlayEvent
-import com.minhlgdo.phonedetoxapp.ui.state.OverlayUiState
+import com.minhlgdo.phonedetoxapp.ui.overlay.OverlayEvent
+import com.minhlgdo.phonedetoxapp.ui.overlay.OverlayUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,8 @@ class OverlayViewModel @Inject constructor(
     private val _uiState =
         MutableStateFlow(OverlayUiState()) // can be used to observe the state of the UI in the ViewModel only
     val uiState: StateFlow<OverlayUiState> = _uiState.asStateFlow()
+
+    val allowsAppOpen = MutableLiveData(false)
 
     init {
         println("OverlayViewModel initialized, current app: $currForegroundApp")
@@ -160,7 +163,10 @@ class OverlayViewModel @Inject constructor(
 
     // Method to enter the blocked app
     private fun enterApp() {
-        // Enter the previous app
-
+        // Make allowsAppOpen in the service to true
+        allowsAppOpen.value = true
+        // Open the previous app
+        val intent = context.packageManager.getLaunchIntentForPackage(currForegroundApp)
+        context.startActivity(intent)
     }
 }

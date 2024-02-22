@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
-import com.minhlgdo.phonedetoxapp.ui.presentation.select_apps.SelectAppsScreen
+import com.minhlgdo.phonedetoxapp.ui.select_apps.SelectAppsScreen
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 import com.minhlgdo.phonedetoxapp.viewmodels.SelectAppsViewModel
 import dagger.hilt.android.AndroidEntryPoint

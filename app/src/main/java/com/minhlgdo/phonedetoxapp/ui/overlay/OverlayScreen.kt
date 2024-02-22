@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.presentation.overlay
+package com.minhlgdo.phonedetoxapp.ui.overlay
 
 import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween

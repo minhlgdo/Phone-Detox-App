@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.presentation.home
+package com.minhlgdo.phonedetoxapp.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height

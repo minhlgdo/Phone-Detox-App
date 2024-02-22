@@ -5,29 +5,15 @@ import android.app.usage.UsageEvents
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.PixelFormat
-import android.os.Build
-import android.os.Handler
+import android.os.Binder
 import android.os.IBinder
-import android.os.Looper
-import android.view.Gravity
-import android.view.WindowManager
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.app.NotificationCompat
-import androidx.room.Room
-import com.minhlgdo.phonedetoxapp.data.local.PhoneAppDatabase
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
-import com.minhlgdo.phonedetoxapp.ui.presentation.overlay.OverlayScreen
-import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.Timer
 import java.util.TimerTask
 import javax.inject.Inject
@@ -42,6 +28,8 @@ class AppMonitoringService : Service() {
     private lateinit var currForegroundApp: String
     private var blockedApps : List<String>? = null
     private var job: Job? = null
+    private val binder = ServiceBinder()
+    private var allowsAppOpen = false
 
     override fun onCreate() {
         super.onCreate()
@@ -52,7 +40,7 @@ class AppMonitoringService : Service() {
             override fun run() {
                 checkForegroundApp()
                 blockedApps?.let {
-                    if (isBlockedApp()) {
+                    if (isBlockedApp() && !allowsAppOpen) {
                         showOverlay()
                     }
                 }
@@ -60,8 +48,8 @@ class AppMonitoringService : Service() {
         }, 0, 1500) // Check every second (adjust as needed)
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onBind(intent: Intent?): IBinder {
+        return binder
     }
 
     private fun checkForegroundApp() {
@@ -81,6 +69,7 @@ class AppMonitoringService : Service() {
                 if ((event.packageName != currForegroundApp) && (event.packageName != "com.minhlgdo.phonedetoxapp")) {
                     println("Foreground app changed: ${event.packageName}")
                     currForegroundApp = event.packageName
+                    allowsAppOpen = false // reset the flag when the foreground app changes
                 }
 
             }
@@ -114,5 +103,17 @@ class AppMonitoringService : Service() {
         }
 
         return START_STICKY
+    }
+
+    // Binder given to other clients
+    inner class ServiceBinder : Binder() {
+        // Return this instance of LocalService so clients can call public methods
+        fun getService(): AppMonitoringService = this@AppMonitoringService
+    }
+
+    // Public method for clients to modify isBlockedAppOpen
+    fun setAppOpen(isOpen: Boolean) {
+        allowsAppOpen = isOpen
+        println("allowsAppOpen: $allowsAppOpen")
     }
 }

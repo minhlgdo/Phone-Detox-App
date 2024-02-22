@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.presentation.overlay
+package com.minhlgdo.phonedetoxapp.ui.overlay
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.minhlgdo.phonedetoxapp.ui.state.OverlayUiState
 
 @Composable
 fun JournalingPopup(

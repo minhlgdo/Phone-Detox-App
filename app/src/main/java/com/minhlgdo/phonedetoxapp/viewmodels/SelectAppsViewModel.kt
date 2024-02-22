@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.minhlgdo.phonedetoxapp.data.local.PhoneApp
 import com.minhlgdo.phonedetoxapp.data.local.model.BlockedAppEntity
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
-import com.minhlgdo.phonedetoxapp.ui.state.SelectAppsUiState
+import com.minhlgdo.phonedetoxapp.ui.select_apps.SelectAppsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

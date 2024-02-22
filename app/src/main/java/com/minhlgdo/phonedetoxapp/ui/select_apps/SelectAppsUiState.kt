@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.state
+package com.minhlgdo.phonedetoxapp.ui.select_apps
 
 import com.minhlgdo.phonedetoxapp.data.local.PhoneApp
 

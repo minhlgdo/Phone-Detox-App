@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.state
+package com.minhlgdo.phonedetoxapp.ui.overlay
 
 data class OverlayUiState (
     val accessCount: Int = 1,

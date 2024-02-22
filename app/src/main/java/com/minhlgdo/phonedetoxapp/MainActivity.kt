@@ -1,5 +1,6 @@
 package com.minhlgdo.phonedetoxapp
 
+import android.app.ActivityManager
 import android.app.AppOpsManager
 import android.content.Intent
 import android.os.Build
@@ -12,8 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
-import com.minhlgdo.phonedetoxapp.ui.presentation.home.MainScreenView
+import com.minhlgdo.phonedetoxapp.ui.home.MainScreenView
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
+
 
 class MainActivity : ComponentActivity() {
     private var usagePermission by mutableStateOf(false)
@@ -77,6 +79,12 @@ class MainActivity : ComponentActivity() {
     // Check if the app has the overlay permission
     private fun hasDrawOverAppPermission(): Boolean {
         return Settings.canDrawOverlays(this)
+    }
+
+    private fun serviceIsRunning(): Boolean {
+        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+        val services = activityManager.getRunningServices(Int.MAX_VALUE)
+        return false
     }
 }
 

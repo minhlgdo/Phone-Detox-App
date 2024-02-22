@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.presentation.overlay
+package com.minhlgdo.phonedetoxapp.ui.overlay
 
 sealed interface OverlayEvent {
     data class SetJournalTitle(val title: String) : OverlayEvent

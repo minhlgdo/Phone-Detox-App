@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.presentation.select_apps
+package com.minhlgdo.phonedetoxapp.ui.select_apps
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
