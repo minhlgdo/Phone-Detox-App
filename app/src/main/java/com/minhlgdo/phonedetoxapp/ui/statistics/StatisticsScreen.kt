@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.home
+package com.minhlgdo.phonedetoxapp.ui.statistics
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,10 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun JournalingScreen() {
+fun StatisticsScreen() {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(text = "Journaling Screen")
+        Text(text = "Statistics Screen")
     }
 }

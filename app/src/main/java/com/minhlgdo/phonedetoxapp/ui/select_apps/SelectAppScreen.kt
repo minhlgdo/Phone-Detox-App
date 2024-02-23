@@ -28,14 +28,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.minhlgdo.phonedetoxapp.viewmodels.SelectAppsViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAppsScreen(
-    viewModel: SelectAppsViewModel,
-    onBack: () -> Unit
+    viewModel: SelectAppsViewModel = hiltViewModel(),
+    navController: NavController
 ) {
 //    var apps by remember { mutableStateOf(emptyList<PhoneApp>()) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -67,7 +68,7 @@ fun SelectAppsScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                 title = { Text(text = "Select apps") },
                 navigationIcon = {
-                    IconButton(onClick = { onBack() }) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.Filled.ArrowBack, "Go back to main screen")
                     }
                 }
@@ -75,7 +76,7 @@ fun SelectAppsScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text(text = "Save blocked apps") },
+                text = { Text(text = "Save") },
                 onClick = {
                     viewModel.onSaveApps()
                 },

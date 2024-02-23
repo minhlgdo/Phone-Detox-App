@@ -2,6 +2,7 @@ package com.minhlgdo.phonedetoxapp.data.repository
 
 import com.minhlgdo.phonedetoxapp.data.local.dao.JournalDao
 import com.minhlgdo.phonedetoxapp.data.local.model.JournalEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -24,5 +25,9 @@ class JournalRepository @Inject constructor(
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val currentDate = LocalDate.now().format(formatter)
         return journalDao.getJournalTodayCount(currentDate).firstOrNull() ?: 0
+    }
+
+    fun getAllJournals() : Flow<List<JournalEntity>> {
+        return journalDao.getAllJournals()
     }
 }

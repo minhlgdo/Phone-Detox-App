@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.viewmodels
+package com.minhlgdo.phonedetoxapp.ui.overlay
 
 import android.content.Context
 import android.content.Intent
@@ -10,8 +10,6 @@ import com.minhlgdo.phonedetoxapp.data.local.model.AppUsageEntity
 import com.minhlgdo.phonedetoxapp.data.local.model.JournalEntity
 import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
-import com.minhlgdo.phonedetoxapp.ui.overlay.OverlayEvent
-import com.minhlgdo.phonedetoxapp.ui.overlay.OverlayUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow

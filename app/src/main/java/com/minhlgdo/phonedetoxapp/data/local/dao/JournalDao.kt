@@ -17,4 +17,7 @@ interface JournalDao {
 
     @Query("SELECT COUNT(id) FROM journal WHERE DATE(time) = DATE(:currDate)")
     fun getJournalTodayCount(currDate: String): Flow<Int>
+
+    @Query("SELECT * FROM journal ORDER BY DATETIME(time) DESC")
+    fun getAllJournals(): Flow<List<JournalEntity>>
 }

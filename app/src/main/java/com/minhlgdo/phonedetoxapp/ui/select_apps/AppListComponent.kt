@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.minhlgdo.phonedetoxapp.viewmodels.SelectAppsViewModel
 import com.minhlgdo.phonedetoxapp.data.local.PhoneApp
 
 @Composable

@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp.ui.home
+package com.minhlgdo.phonedetoxapp.ui.landing
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -26,6 +26,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.minhlgdo.phonedetoxapp.ui.home.HomeScreen
+import com.minhlgdo.phonedetoxapp.ui.journaling.JournalingScreen
+import com.minhlgdo.phonedetoxapp.ui.statistics.StatisticsScreen
 
 @Composable
 fun MainScreenView(hasUsagePermission: Boolean, hasPopupPermission: Boolean) {
@@ -50,8 +53,7 @@ fun MainScreenView(hasUsagePermission: Boolean, hasPopupPermission: Boolean) {
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Home,
-        BottomNavItem.Statistics,
-        BottomNavItem.Journaling
+        BottomNavItem.Statistics
     )
     BottomNavigation(
         modifier = Modifier.height(56.dp),
@@ -100,7 +102,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 sealed class BottomNavItem(val title: String, val icon: ImageVector, val screenRoute: String) {
     object Home : BottomNavItem("Home", Icons.Filled.Home, "Home")
     object Statistics : BottomNavItem("Statistics", Icons.Filled.Info, "Statistics")
-    object Journaling : BottomNavItem("Journaling", Icons.Filled.Create, "Journaling")
+//    object Journaling : BottomNavItem("Journaling", Icons.Filled.Create, "Journaling")
 }
 
 @Composable
@@ -112,9 +114,9 @@ fun NavigationGraph(navController: NavHostController) {
         composable("Statistics") {
             StatisticsScreen()
         }
-        composable("Journaling") {
-            JournalingScreen()
-        }
+//        composable("Journaling") {
+//            JournalingScreen()
+//        }
     }
 }
 

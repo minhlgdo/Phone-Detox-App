@@ -1,4 +1,4 @@
-package com.minhlgdo.phonedetoxapp
+package com.minhlgdo.phonedetoxapp.activities
 
 import android.content.ComponentName
 import android.content.Intent
@@ -8,10 +8,10 @@ import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.minhlgdo.phonedetoxapp.AppMonitoringService
 import com.minhlgdo.phonedetoxapp.ui.overlay.OverlayScreen
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
-import com.minhlgdo.phonedetoxapp.viewmodels.OverlayViewModel
+import com.minhlgdo.phonedetoxapp.ui.overlay.OverlayViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -29,7 +29,6 @@ class PhoneAppRepository @Inject constructor
         return appDao.getAppName(packageName).firstOrNull() ?: ""
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getTodayUsage(app: String) : Int {
         if (app.isEmpty()) return 0
         // Get the current date

@@ -1,6 +1,5 @@
-package com.minhlgdo.phonedetoxapp
+package com.minhlgdo.phonedetoxapp.activities
 
-import android.app.ActivityManager
 import android.app.AppOpsManager
 import android.content.Intent
 import android.os.Build
@@ -8,7 +7,6 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,8 +15,9 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.minhlgdo.phonedetoxapp.AppMonitoringService
 import com.minhlgdo.phonedetoxapp.data.local.ServiceManager
-import com.minhlgdo.phonedetoxapp.ui.home.MainScreenView
+import com.minhlgdo.phonedetoxapp.ui.landing.MainScreenView
 import com.minhlgdo.phonedetoxapp.ui.theme.PhoneDetoxAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -57,6 +56,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // Start the service if it's not running
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 serviceManager.getIsRunning.collect { isRunning ->
@@ -66,11 +66,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
-
-
-        // Start background service
-//        startService(Intent(this, AppMonitoringService::class.java))
     }
 
     override fun onResume() {
@@ -103,11 +98,6 @@ class MainActivity : ComponentActivity() {
     // Check if the app has the overlay permission
     private fun hasDrawOverAppPermission(): Boolean {
         return Settings.canDrawOverlays(this)
-    }
-
-    private fun serviceIsRunning(): Boolean {
-        val activityManager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
-        return false
     }
 }
 
