@@ -33,6 +33,7 @@ fun OverlayScreen(viewModel: OverlayViewModel) {
     var visible by remember { mutableStateOf(true) }
     val uiState by viewModel.uiState.collectAsState()
     val backgroundColor = remember { Animatable(Color.Black) }
+    val reasons = viewModel.reasons.collectAsState(initial = emptyList())
 
     LaunchedEffect(Unit) {
         if (visible) {
@@ -44,6 +45,14 @@ fun OverlayScreen(viewModel: OverlayViewModel) {
 
     if (uiState.journalPopup) {
         JournalingPopup(viewModel::onEvent, uiState)
+    }
+
+    if (uiState.showBottomSheet) {
+        ReasonsBottomSheet(
+            reasonList = reasons.value,
+            onEvent = viewModel::onEvent,
+            state = uiState
+        )
     }
 
     if (visible) {
@@ -91,7 +100,10 @@ fun OverlayScreen(viewModel: OverlayViewModel) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 TextButton(
-                    onClick = { viewModel.onEvent(OverlayEvent.EnterBlockedApp) }
+                    onClick = {
+                        viewModel.onEvent(OverlayEvent.ShowBottomSheet)
+//                        viewModel.onEvent(OverlayEvent.EnterBlockedApp)
+                    }
                 ) {
                     Text(text = "Continue using the app")
                 }

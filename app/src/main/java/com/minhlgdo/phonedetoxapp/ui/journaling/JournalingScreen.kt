@@ -53,6 +53,7 @@ fun JournalingScreen(
             )
         }
     ) {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()

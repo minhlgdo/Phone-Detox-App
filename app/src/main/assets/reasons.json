@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "reason": "Boredom",
+    "icon": "\uD83D\uDE36"
+  },
+  {
+    "id": 2,
+    "reason": "Stress",
+    "icon": "\uD83E\uDD75"
+  },
+  {
+    "id": 3,
+    "reason": "Tired",
+    "icon": "\uD83D\uDE2A"
+  },
+  {
+    "id": 4,
+    "reason": "Procrastination",
+    "icon": "\uD83D\uDE44"
+  },
+  {
+    "id": 5,
+    "reason": "Anxious",
+    "icon": "\uD83E\uDEE0"
+  },
+  {
+    "id": 6,
+    "reason": "Sad",
+    "icon": "\uD83E\uDD72"
+  },
+  {
+    "id": 7,
+    "reason": "Can not sleep",
+    "icon": "\uD83D\uDE14"
+  },
+  {
+    "id": 8,
+    "reason": "Toilet",
+    "icon": "\uD83D\uDEBD"
+  },
+  {
+    "id": 9,
+    "reason": "Reply messages",
+    "icon": "\uD83D\uDC8C"
+  },
+  {
+    "id": 10,
+    "reason": "Work",
+    "icon": "\uD83D\uDCBB"
+  }
+]

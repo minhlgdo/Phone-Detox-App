@@ -24,13 +24,13 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAppRepository(db: PhoneAppDatabase) : PhoneAppRepository {
-        return PhoneAppRepository(db.appDao, db.usageDao)
+        return PhoneAppRepository(db.appDao(), db.usageDao(), db.reasonDao())
     }
 
     @Provides
     @Singleton
     fun provideJournalRepository(db: PhoneAppDatabase) : JournalRepository {
-        return JournalRepository(db.journalDao)
+        return JournalRepository(db.journalDao())
     }
 
     @Provides

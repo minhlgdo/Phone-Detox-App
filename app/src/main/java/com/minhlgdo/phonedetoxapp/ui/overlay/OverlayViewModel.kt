@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 @HiltViewModel
 class OverlayViewModel @Inject constructor(
@@ -31,20 +32,20 @@ class OverlayViewModel @Inject constructor(
     private val currForegroundApp: String
         get() = _currForegroundApp.value ?: ""
 
-    private val todaysJournalCount = MutableStateFlow(0)
-
     private val _uiState =
         MutableStateFlow(OverlayUiState()) // can be used to observe the state of the UI in the ViewModel only
     val uiState: StateFlow<OverlayUiState> = _uiState.asStateFlow()
 
     val allowsAppOpen = MutableLiveData(false)
+    private var logId : Long = 0
+
+    val reasons = phoneRepo.getReasons()
 
     init {
         println("OverlayViewModel initialized, current app: $currForegroundApp")
         runBlocking {
             getAppName()
             getAppUsage()
-            getJournalCount()
         }
     }
 
@@ -63,8 +64,9 @@ class OverlayViewModel @Inject constructor(
     private suspend fun getAppUsage() {
         // Update the app usage
         if (currForegroundApp.isEmpty()) return
-        phoneRepo.updateAppUsage(AppUsageEntity(currForegroundApp))
-        println("App usage updated")
+//        accessLog =
+        logId = phoneRepo.upsertAppUsage(AppUsageEntity(currForegroundApp))
+        println("App usage updated, logId: $logId")
 
         // Get the app usage
         val count = phoneRepo.getTodayUsage(currForegroundApp)
@@ -73,14 +75,6 @@ class OverlayViewModel @Inject constructor(
             currentState.copy(
                 accessCount = count
             )
-        }
-    }
-
-    private fun getJournalCount() {
-        viewModelScope.launch {
-            val count = journalRepo.getJournalTodayCount()
-            println("Journal count: $count")
-            todaysJournalCount.value = count
         }
     }
 
@@ -130,15 +124,56 @@ class OverlayViewModel @Inject constructor(
                 // Go back to the phone's home screen
                 returnHome()
             }
+            is OverlayEvent.ShowBottomSheet -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        showBottomSheet = true
+                    )
+                }
+            }
+
+            is OverlayEvent.HideBottomSheet -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        showBottomSheet = false
+                    )
+                }
+            }
+
+            is OverlayEvent.UpdateAccessLog -> {
+                updateAccessLog()
+            }
+
+            is OverlayEvent.SelectReason -> {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        selectedReason = event.reason
+                    )
+                }
+            }
 
         }
     }
 
-    private fun saveJournal() {
+    private fun updateAccessLog() {
+        val reason = _uiState.value.selectedReason
+        if (reason.isEmpty()) return
         viewModelScope.launch {
-            val title = _uiState.value.journalTitle
-            val content = _uiState.value.journalContent
-            if (title.isEmpty() || content.isEmpty()) return@launch
+            phoneRepo.updateUsageReason(logId = logId, reason = reason)
+            _uiState.update { currentState ->
+                currentState.copy(
+                    selectedReason = "",
+                    showBottomSheet = false
+                )
+            }
+        }
+    }
+
+    private fun saveJournal() {
+        val title = _uiState.value.journalTitle
+        val content = _uiState.value.journalContent
+        if (title.isEmpty() || content.isEmpty()) return
+        viewModelScope.launch {
             journalRepo.insertJournal(JournalEntity(title, content))
             _uiState.update { currentState ->
                 currentState.copy(

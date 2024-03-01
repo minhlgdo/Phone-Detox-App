@@ -5,5 +5,7 @@ data class OverlayUiState (
     val appName: String = "",
     val journalPopup: Boolean = false,
     val journalTitle: String = "",
-    val journalContent: String = ""
+    val journalContent: String = "",
+    val showBottomSheet : Boolean = false,
+    val selectedReason: String = ""
 )

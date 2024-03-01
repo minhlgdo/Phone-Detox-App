@@ -1,18 +1,18 @@
 package com.minhlgdo.phonedetoxapp.data.repository
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.minhlgdo.phonedetoxapp.data.local.dao.AppUsageDao
 import com.minhlgdo.phonedetoxapp.data.local.dao.BlockedAppDao
+import com.minhlgdo.phonedetoxapp.data.local.dao.ReasonDao
 import com.minhlgdo.phonedetoxapp.data.local.model.AppUsageEntity
 import com.minhlgdo.phonedetoxapp.data.local.model.BlockedAppEntity
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
+import kotlin.math.log
 
 class PhoneAppRepository @Inject constructor
-    (private val appDao: BlockedAppDao, private val usageDao: AppUsageDao) {
+    (private val appDao: BlockedAppDao, private val usageDao: AppUsageDao, private val reasonDao: ReasonDao) {
 
     suspend fun insertBlockedApps(phoneApp: BlockedAppEntity) {
         appDao.insertBlockedApps(phoneApp)
@@ -29,7 +29,7 @@ class PhoneAppRepository @Inject constructor
         return appDao.getAppName(packageName).firstOrNull() ?: ""
     }
 
-    suspend fun getTodayUsage(app: String) : Int {
+    suspend fun getTodayUsage(app: String): Int {
         if (app.isEmpty()) return 0
         // Get the current date
         // (as DATE('now') in SQLite returns the date in UTC timezone, which is not what we want)
@@ -38,8 +38,16 @@ class PhoneAppRepository @Inject constructor
         return usageDao.getAppUsageTodayCount(app, currentDate).firstOrNull() ?: 0
     }
 
-    suspend fun updateAppUsage(app: AppUsageEntity) {
-        usageDao.upsertAppUsage(app)
+    // Return the id of the inserted or updated app usage
+    suspend fun upsertAppUsage(app: AppUsageEntity) : Long {
+        return usageDao.upsertAppUsage(app)
     }
+
+    suspend fun updateUsageReason(logId: Long, reason: String) {
+        return usageDao.updateUsageReason(logId, reason)
+    }
+
+    // Get reasons for app blocking
+    fun getReasons() = reasonDao.getReasons()
 
 }
