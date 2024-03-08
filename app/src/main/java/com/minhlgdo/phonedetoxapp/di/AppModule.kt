@@ -5,6 +5,7 @@ import com.minhlgdo.phonedetoxapp.data.local.PhoneAppDatabase
 import com.minhlgdo.phonedetoxapp.data.local.ServiceManager
 import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
+import com.minhlgdo.phonedetoxapp.data.repository.UsageRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,13 +25,19 @@ object AppModule {
     @Provides
     @Singleton
     fun provideAppRepository(db: PhoneAppDatabase) : PhoneAppRepository {
-        return PhoneAppRepository(db.appDao(), db.usageDao(), db.reasonDao())
+        return PhoneAppRepository(db.appDao())
     }
 
     @Provides
     @Singleton
     fun provideJournalRepository(db: PhoneAppDatabase) : JournalRepository {
         return JournalRepository(db.journalDao())
+    }
+
+    @Provides
+    @Singleton
+    fun provideUsageRepository(db: PhoneAppDatabase) : UsageRepository {
+        return UsageRepository(db.usageDao(), db.reasonDao())
     }
 
     @Provides

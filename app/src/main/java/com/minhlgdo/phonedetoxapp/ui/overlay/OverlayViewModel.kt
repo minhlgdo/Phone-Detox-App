@@ -10,6 +10,7 @@ import com.minhlgdo.phonedetoxapp.data.local.model.AppUsageEntity
 import com.minhlgdo.phonedetoxapp.data.local.model.JournalEntity
 import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
+import com.minhlgdo.phonedetoxapp.data.repository.UsageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ import kotlin.properties.Delegates
 
 @HiltViewModel
 class OverlayViewModel @Inject constructor(
+    private val usageRepo: UsageRepository,
     private val phoneRepo: PhoneAppRepository,
     private val journalRepo: JournalRepository,
     savedStateHandle: SavedStateHandle,
@@ -39,7 +41,7 @@ class OverlayViewModel @Inject constructor(
     val allowsAppOpen = MutableLiveData(false)
     private var logId : Long = 0
 
-    val reasons = phoneRepo.getReasons()
+    val reasons = usageRepo.getReasons()
 
     init {
         println("OverlayViewModel initialized, current app: $currForegroundApp")
@@ -65,11 +67,11 @@ class OverlayViewModel @Inject constructor(
         // Update the app usage
         if (currForegroundApp.isEmpty()) return
 //        accessLog =
-        logId = phoneRepo.upsertAppUsage(AppUsageEntity(currForegroundApp))
+        logId = usageRepo.upsertAppUsage(AppUsageEntity(currForegroundApp))
         println("App usage updated, logId: $logId")
 
         // Get the app usage
-        val count = phoneRepo.getTodayUsage(currForegroundApp)
+        val count = usageRepo.getTodayUsage(currForegroundApp)
 //        println("App usage: $count")
         _uiState.update { currentState ->
             currentState.copy(
@@ -159,7 +161,7 @@ class OverlayViewModel @Inject constructor(
         val reason = _uiState.value.selectedReason
         if (reason.isEmpty()) return
         viewModelScope.launch {
-            phoneRepo.updateUsageReason(logId = logId, reason = reason)
+            usageRepo.updateUsageReason(logId = logId, reason = reason)
             _uiState.update { currentState ->
                 currentState.copy(
                     selectedReason = "",

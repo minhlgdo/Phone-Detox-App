@@ -26,7 +26,7 @@ import com.minhlgdo.phonedetoxapp.workers.SeedDatabaseWorker
     version = 3,
 )
 @TypeConverters(Converters::class)
-abstract class PhoneAppDatabase() : RoomDatabase() {
+abstract class PhoneAppDatabase : RoomDatabase() {
     abstract fun appDao(): BlockedAppDao
     abstract fun usageDao(): AppUsageDao
     abstract fun journalDao(): JournalDao

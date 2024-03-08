@@ -31,7 +31,7 @@ fun MainHome(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding()),
+                .padding(top = it.calculateTopPadding() + 16.dp, bottom = it.calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             HomeComponent(

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,7 +24,12 @@ fun HomeComponent(onClick: () -> Unit, text: String) {
         color = MaterialTheme.colorScheme.background,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(
+                top = 8.dp,
+                bottom = 8.dp,
+                start = 16.dp,
+                end = 16.dp
+            ),
         onClick = onClick
     ) {
         Column {
@@ -37,7 +43,7 @@ fun HomeComponent(onClick: () -> Unit, text: String) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Divider()
+            HorizontalDivider()
         }
     }
 

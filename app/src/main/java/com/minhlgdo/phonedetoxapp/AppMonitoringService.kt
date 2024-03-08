@@ -59,7 +59,7 @@ class AppMonitoringService : Service() {
         val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val currTime = System.currentTimeMillis()
         val usageEvents = usageStatsManager.queryEvents(currTime - 1000 * 5, currTime)
-
+//        println("usageEvents: ${usageEvents.getNextEvent(UsageEvents.Event())}")
         while (usageEvents.hasNextEvent()) {
             val event = UsageEvents.Event()
             usageEvents.getNextEvent(event)

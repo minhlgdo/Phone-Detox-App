@@ -1,6 +1,6 @@
 package com.minhlgdo.phonedetoxapp.data.local
 
-data class AppUsageResult(
-    val time: String,
+data class UsageResult(
+    val date: String,
     val count: Int
 )
