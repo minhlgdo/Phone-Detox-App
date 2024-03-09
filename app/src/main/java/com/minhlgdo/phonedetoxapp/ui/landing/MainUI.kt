@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
@@ -27,7 +26,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.minhlgdo.phonedetoxapp.ui.home.HomeScreen
-import com.minhlgdo.phonedetoxapp.ui.journaling.JournalingScreen
 import com.minhlgdo.phonedetoxapp.ui.statistics.StatisticsScreen
 
 @Composable

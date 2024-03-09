@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,37 +19,57 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.CartesianChartHost
 import com.patrykandpatrick.vico.compose.chart.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.chart.rememberCartesianChart
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.patrykandpatrick.vico.core.model.columnSeries
+import java.time.LocalDate
 
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatisticsScreen() {
+fun StatisticsScreen(
+    viewModel: StatisticsViewModel = hiltViewModel()
+) {
     var expanded by remember { mutableStateOf(false) }
     val modelProducer = remember { CartesianChartModelProducer.build() }
+    val uiState by viewModel.uiState.collectAsState()
+    val options = listOf("Last 7 days")
+    var selectedOption by remember { mutableStateOf(options[0]) }
+
+    // default values for the chart
+    var chartVal = listOf(0, 0, 0, 0, 0, 0, 0)
+    var xVal = (0..6).map { LocalDate.now().minusDays(it.toLong()).toString() }
+    val labelListKey = ExtraStore.Key<List<String>>()
+//    val dateFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault())
 
     LaunchedEffect(Unit) {
-        modelProducer.tryRunTransaction {
-            columnSeries {
-                series(
-                    4, 12, 8, 16
-                )
+        viewModel.uiState.collect { state ->
+            if (uiState.attempts.isNotEmpty()) {
+                chartVal = state.attempts.map { it.count }
+                xVal = state.attempts.map { it.date }
             }
 
+            modelProducer.tryRunTransaction {
+                // check whether extra store[ExtraStore.Key] is already set
+                columnSeries {
+                    series(chartVal)
+                    updateExtras { it[labelListKey] = xVal }
+                }
+            }
         }
+
     }
 
     Scaffold(topBar = {
@@ -71,22 +89,32 @@ fun StatisticsScreen() {
                 )
                 .verticalScroll(rememberScrollState())
         ) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
+            ExposedDropdownMenuBox(expanded = expanded,
                 onExpandedChange = { expanded = !expanded }) {
-                TextField(value = "Select a time range",
+                TextField(
+                    value = selectedOption,
+                    label = { Text("Select time range") },
                     onValueChange = { },
                     readOnly = true,
                     trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.ArrowDropDown,
-                            contentDescription = "Expand",
-                            tint = MaterialTheme.colorScheme.onSurface
+                        TrailingIcon(
+                            expanded = expanded
                         )
-                    })
+                    },
+                    modifier = Modifier.menuAnchor()
+                )
 
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(text = { Text("Last 7 days") }, onClick = { expanded = false })
+                    options.forEach { text ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedOption = text
+                                expanded = false
+                            },
+                            text = { Text(text) }
+                        )
+                    }
+
                 }
             }
 
@@ -98,14 +126,18 @@ fun StatisticsScreen() {
             )
 
             Text(
-                text = "Total: 40",
+                text = "Total: ${uiState.totalAttempts}",
                 style = MaterialTheme.typography.bodyMedium
             )
 
             CartesianChartHost(rememberCartesianChart(
                 rememberColumnCartesianLayer(),
                 startAxis = rememberStartAxis(),
-                bottomAxis = rememberBottomAxis(),
+                bottomAxis = rememberBottomAxis(valueFormatter = remember {
+                    { x, chartValues, _ ->
+                        chartValues.model.extraStore[labelListKey][x.toInt()]
+                    }
+                }),
             ), modelProducer, placeholder = { Text("Loading...") })
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -116,8 +148,7 @@ fun StatisticsScreen() {
             )
 
             Text(
-                text = "Total: 40",
-                style = MaterialTheme.typography.bodyMedium
+                text = "Total: 40", style = MaterialTheme.typography.bodyMedium
             )
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -55,7 +55,6 @@ fun ReasonPieChart(
     var animationPlayed by remember { mutableStateOf(false) }
     var lastValue = 0f
     val floatValue = percentageData.map { 360 * it.second } // 360 is the full circle
-    println("floatValue: $floatValue")
 
     // it is the diameter value of the Pie
     val animateSize by animateFloatAsState(

@@ -23,7 +23,7 @@ import com.minhlgdo.phonedetoxapp.workers.SeedDatabaseWorker
 
 @Database(
     entities = [BlockedAppEntity::class, AppUsageEntity::class, JournalEntity::class, ReasonEntity::class],
-    version = 3,
+    version = 4,
 )
 @TypeConverters(Converters::class)
 abstract class PhoneAppDatabase : RoomDatabase() {
@@ -47,7 +47,7 @@ abstract class PhoneAppDatabase : RoomDatabase() {
         // https://medium.com/google-developers/7-pro-tips-for-room-fbadea4bfbd1#4785
         private fun buildDatabase(context: Context): PhoneAppDatabase {
             return Room.databaseBuilder(context, PhoneAppDatabase::class.java, "detox.db")
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
@@ -75,5 +75,14 @@ abstract class PhoneAppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE usage_table ADD COLUMN reason TEXT")
             }
         }
+
+        // Migration from version 3 to version 4, create new table for reasons
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // create new table for reasons
+                db.execSQL("CREATE TABLE reasons (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, reason TEXT NOT NULL, icon TEXT NOT NULL)")
+            }
+        }
+
     }
 }

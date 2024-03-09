@@ -1,8 +1,10 @@
 package com.minhlgdo.phonedetoxapp.data.repository
 
+import com.minhlgdo.phonedetoxapp.data.local.UsageResult
 import com.minhlgdo.phonedetoxapp.data.local.dao.AppUsageDao
 import com.minhlgdo.phonedetoxapp.data.local.dao.ReasonDao
 import com.minhlgdo.phonedetoxapp.data.local.model.AppUsageEntity
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -31,4 +33,11 @@ class UsageRepository @Inject constructor(
 
     // Get reasons for app blocking
     fun getReasons() = reasonDao.getReasons()
+
+    // get the usage result for the blocked apps within last 7 days
+    fun getUsageLast7Days() : Flow<List<UsageResult>> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val currentDate = LocalDate.now().format(formatter)
+        return usageDao.getUsageCountForLast7Days(currentDate)
+    }
 }
