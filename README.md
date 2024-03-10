@@ -11,15 +11,14 @@
     - [x] Detect when a blocked app is opened
     - [x] Show UI asking the user to wait for a second or do journaling
     - [x] If the user wants to open the app, open the app and increase the number of times the user opened the app
-- [ ] Statistics tab: how many times the user opened the blocked apps in a day, week, month, year
-- [ ] Journaling feature: 
-    - [ ] Add a journal
-    - [ ] View all journals
-    - [ ] Send weekly report to the user
+- [x] Statistics tab: how many times the user opened the blocked apps in a week (for now!!!)
+- [x] Journaling feature: 
+    - [x] Add a journal
+    - [x] View all journals
 
 ## Used technologies: 
 - Language: Kotlin
-- UI: Jetpack Compose
+- UI: Jetpack Compose & [Vico](https://patrykandpatrick.com/vico/wiki/) (for graph visualization)
 - Database: Room (with proper migration policies)
-- Foreground Service + WorkerManager
+- Foreground Service (to track the foreground app) + WorkerManager
 - Dependency Injection: Dagger-Hilt
