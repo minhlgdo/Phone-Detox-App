@@ -1,7 +1,7 @@
 package com.minhlgdo.phonedetoxapp.di
 
 import android.content.Context
-import com.minhlgdo.phonedetoxapp.data.local.PhoneAppDatabase
+import com.minhlgdo.phonedetoxapp.data.local.AppDatabase
 import com.minhlgdo.phonedetoxapp.data.local.ServiceManager
 import com.minhlgdo.phonedetoxapp.data.repository.JournalRepository
 import com.minhlgdo.phonedetoxapp.data.repository.PhoneAppRepository
@@ -18,25 +18,25 @@ import javax.inject.Singleton
 object AppModule {
    @Provides
    @Singleton
-   fun provideAppDatabase(@ApplicationContext context: Context): PhoneAppDatabase {
-      return PhoneAppDatabase.getInstance(context)
+   fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+      return AppDatabase.getInstance(context)
    }
 
     @Provides
     @Singleton
-    fun provideAppRepository(db: PhoneAppDatabase) : PhoneAppRepository {
+    fun provideAppRepository(db: AppDatabase) : PhoneAppRepository {
         return PhoneAppRepository(db.appDao())
     }
 
     @Provides
     @Singleton
-    fun provideJournalRepository(db: PhoneAppDatabase) : JournalRepository {
+    fun provideJournalRepository(db: AppDatabase) : JournalRepository {
         return JournalRepository(db.journalDao())
     }
 
     @Provides
     @Singleton
-    fun provideUsageRepository(db: PhoneAppDatabase) : UsageRepository {
+    fun provideUsageRepository(db: AppDatabase) : UsageRepository {
         return UsageRepository(db.usageDao(), db.reasonDao())
     }
 

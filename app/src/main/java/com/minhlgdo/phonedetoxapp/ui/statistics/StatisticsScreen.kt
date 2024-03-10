@@ -32,10 +32,14 @@ import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.CartesianChartHost
 import com.patrykandpatrick.vico.compose.chart.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.chart.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.component.rememberLineComponent
+import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.model.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.model.ExtraStore
 import com.patrykandpatrick.vico.core.model.columnSeries
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,23 +53,25 @@ fun StatisticsScreen(
     var selectedOption by remember { mutableStateOf(options[0]) }
 
     // default values for the chart
-    var chartVal = listOf(0, 0, 0, 0, 0, 0, 0)
-    var xVal = (0..6).map { LocalDate.now().minusDays(it.toLong()).toString() }
+    var chartData = (6 downTo 0).associate {
+        LocalDate.now().minusDays(it.toLong()).toString() to 0
+    }
     val labelListKey = ExtraStore.Key<List<String>>()
-//    val dateFormatter = DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault())
+    val dateFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
 
     LaunchedEffect(Unit) {
+
         viewModel.uiState.collect { state ->
             if (uiState.attempts.isNotEmpty()) {
-                chartVal = state.attempts.map { it.count }
-                xVal = state.attempts.map { it.date }
+                chartData = chartData + state.attempts
             }
+//            println("LaunchedEffect, value of reasons: ${uiState.usageReason}")
 
             modelProducer.tryRunTransaction {
                 // check whether extra store[ExtraStore.Key] is already set
                 columnSeries {
-                    series(chartVal)
-                    updateExtras { it[labelListKey] = xVal }
+                    series(chartData.values.toList())
+                    updateExtras { it[labelListKey] = chartData.keys.toList() }
                 }
             }
         }
@@ -106,13 +112,10 @@ fun StatisticsScreen(
 
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     options.forEach { text ->
-                        DropdownMenuItem(
-                            onClick = {
-                                selectedOption = text
-                                expanded = false
-                            },
-                            text = { Text(text) }
-                        )
+                        DropdownMenuItem(onClick = {
+                            selectedOption = text
+                            expanded = false
+                        }, text = { Text(text) })
                     }
 
                 }
@@ -131,29 +134,51 @@ fun StatisticsScreen(
             )
 
             CartesianChartHost(rememberCartesianChart(
-                rememberColumnCartesianLayer(),
+                rememberColumnCartesianLayer(
+                    listOf(
+                        rememberLineComponent(
+                            color = MaterialTheme.colorScheme.primary,
+                            thickness = 16.dp,
+                            shape = Shapes.roundedCornerShape(allPercent = 10)
+                        )
+                    )
+
+                ),
                 startAxis = rememberStartAxis(),
                 bottomAxis = rememberBottomAxis(valueFormatter = remember {
                     { x, chartValues, _ ->
-                        chartValues.model.extraStore[labelListKey][x.toInt()]
+                        LocalDate.parse(chartValues.model.extraStore[labelListKey][x.toInt()])
+                            .format(dateFormatter)
                     }
                 }),
-            ), modelProducer, placeholder = { Text("Loading...") })
+            ),
+                modelProducer,
+                placeholder = { Text("Loading...") },
+                modifier = Modifier.padding(top = 16.dp)
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Attempts using restricted apps",
+                text = "Reasons for using restricted apps",
                 style = MaterialTheme.typography.titleMedium
             )
 
-            Text(
-                text = "Total: 40", style = MaterialTheme.typography.bodyMedium
-            )
+            val quitFormatter = String.format("%.1f", uiState.quitRate)
+            if (uiState.totalAttempts == 0) {
+                Text(
+                    text = "No attempts recorded",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                Text(
+                    text = "Among the ${uiState.totalAttempts} attempts, ${uiState.quitTimes} times ($quitFormatter%) you decided not to use the app",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                ReasonPieChart(uiState.usageReason)
+            }
 
-            ReasonPieChartPreview()
 
         }
     }

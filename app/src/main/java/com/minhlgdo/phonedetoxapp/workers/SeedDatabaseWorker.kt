@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.JsonReader
-import com.minhlgdo.phonedetoxapp.data.local.PhoneAppDatabase
+import com.minhlgdo.phonedetoxapp.data.local.AppDatabase
 import com.minhlgdo.phonedetoxapp.data.local.model.ReasonEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,7 +24,7 @@ class SeedDatabaseWorker(
                     val reasonType = object : TypeToken<List<ReasonEntity>>() {}.type
                     val reasonList: List<ReasonEntity> = Gson().fromJson(jsonReader, reasonType)
 
-                    val database = PhoneAppDatabase.getInstance(applicationContext)
+                    val database = AppDatabase.getInstance(applicationContext)
                     database.reasonDao().upsertAllReasons(reasonList)
 
                     println("Seeding database successfully completed")

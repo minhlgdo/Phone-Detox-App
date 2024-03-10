@@ -13,6 +13,7 @@ import javax.inject.Inject
 class UsageRepository @Inject constructor(
     private val usageDao: AppUsageDao, private val reasonDao: ReasonDao
 ) {
+
     suspend fun getTodayUsage(app: String): Int {
         if (app.isEmpty()) return 0
         // Get the current date
@@ -35,9 +36,23 @@ class UsageRepository @Inject constructor(
     fun getReasons() = reasonDao.getReasons()
 
     // get the usage result for the blocked apps within last 7 days
-    fun getUsageLast7Days() : Flow<List<UsageResult>> {
+    fun getUsageLast7Days() : Flow<Map<String, Int>> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val currentDate = LocalDate.now().format(formatter)
-        return usageDao.getUsageCountForLast7Days(currentDate)
+        return usageDao.getWeeklyUsageCount(currentDate)
+    }
+
+    // Get the number of times the app was quit after overlay was shown within the last 7 days
+    fun getQuitLast7Days() : Flow<UsageResult> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val currentDate = LocalDate.now().format(formatter)
+        return usageDao.getWeeklyAppExitResult(currentDate)
+    }
+
+    // Get the reasons of app usage for the last 7 days, and the probability of each reason
+    fun getReasonsLast7Days() : Flow<Map<String, UsageResult>> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val currentDate = LocalDate.now().format(formatter)
+        return usageDao.getReasonsForLast7Days(currentDate)
     }
 }

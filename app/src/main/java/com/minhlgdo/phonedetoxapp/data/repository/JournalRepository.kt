@@ -20,13 +20,6 @@ class JournalRepository @Inject constructor(
         journalDao.deleteJournal(journal)
     }
 
-    suspend fun getJournalTodayCount() : Int {
-        // Get the current date
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val currentDate = LocalDate.now().format(formatter)
-        return journalDao.getJournalTodayCount(currentDate).firstOrNull() ?: 0
-    }
-
     fun getAllJournals() : Flow<List<JournalEntity>> {
         return journalDao.getAllJournals()
     }

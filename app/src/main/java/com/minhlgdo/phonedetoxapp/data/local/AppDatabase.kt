@@ -9,7 +9,6 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkerParameters
 import com.minhlgdo.phonedetoxapp.data.local.dao.AppUsageDao
 import com.minhlgdo.phonedetoxapp.data.local.dao.BlockedAppDao
 import com.minhlgdo.phonedetoxapp.data.local.dao.JournalDao
@@ -26,7 +25,7 @@ import com.minhlgdo.phonedetoxapp.workers.SeedDatabaseWorker
     version = 4,
 )
 @TypeConverters(Converters::class)
-abstract class PhoneAppDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun appDao(): BlockedAppDao
     abstract fun usageDao(): AppUsageDao
     abstract fun journalDao(): JournalDao
@@ -35,9 +34,9 @@ abstract class PhoneAppDatabase : RoomDatabase() {
     companion object {
         // Singleton prevents multiple instances of database opening at the same time
         @Volatile
-        private var instance: PhoneAppDatabase? = null
+        private var instance: AppDatabase? = null
 
-        fun getInstance(context: Context): PhoneAppDatabase {
+        fun getInstance(context: Context): AppDatabase {
             return instance ?: synchronized(this) {
                 instance ?: buildDatabase(context).also { instance = it }
             }
@@ -45,8 +44,8 @@ abstract class PhoneAppDatabase : RoomDatabase() {
 
         // Create and pre-populate the database. See this article for more details:
         // https://medium.com/google-developers/7-pro-tips-for-room-fbadea4bfbd1#4785
-        private fun buildDatabase(context: Context): PhoneAppDatabase {
-            return Room.databaseBuilder(context, PhoneAppDatabase::class.java, "detox.db")
+        private fun buildDatabase(context: Context): AppDatabase {
+            return Room.databaseBuilder(context, AppDatabase::class.java, "detox.db")
                 .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

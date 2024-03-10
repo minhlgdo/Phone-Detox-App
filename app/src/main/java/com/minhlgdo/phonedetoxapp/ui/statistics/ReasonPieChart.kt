@@ -1,5 +1,6 @@
 package com.minhlgdo.phonedetoxapp.ui.statistics
 
+import android.telecom.Call.Details
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.minhlgdo.phonedetoxapp.data.local.UsageResult
 import com.minhlgdo.phonedetoxapp.ui.theme.Blue200
 import com.minhlgdo.phonedetoxapp.ui.theme.Blue80
 import com.minhlgdo.phonedetoxapp.ui.theme.Pink40
@@ -37,20 +40,23 @@ import com.minhlgdo.phonedetoxapp.ui.theme.Purple80
 import com.minhlgdo.phonedetoxapp.ui.theme.PurpleGrey40
 import com.minhlgdo.phonedetoxapp.ui.theme.PurpleGrey80
 import com.minhlgdo.phonedetoxapp.ui.theme.Teal200
+import com.minhlgdo.phonedetoxapp.ui.theme.Teal40
 
 // Pie chart, referred from https://medium.com/@developerchunk/create-custom-pie-chart-with-animations-in-jetpack-compose-android-studio-kotlin-49cf95ef321e
 
 @Composable
 fun ReasonPieChart(
-    originalData: List<Pair<String, Int>>,
-    percentageData: List<Pair<String, Float>>,
+    data: List<Pair<String, UsageResult>>,
     radiusOuter: Dp = 100.dp,
     chartBarWidth: Dp = 35.dp,
     animDuration: Int = 1000
 ) {
     var animationPlayed by remember { mutableStateOf(false) }
     var lastValue = 0f
-    val floatValue = percentageData.map { 360 * it.second } // 360 is the full circle
+
+    // get a list of degrees for each data entry
+    val degrees = data.map { 360 * it.second.prob } // 360 is the full circle
+    // get a list of pairs of data entries from data
 
     // it is the diameter value of the Pie
     val animateSize by animateFloatAsState(
@@ -67,9 +73,9 @@ fun ReasonPieChart(
         ), label = "animateRotation"
     )
 
-    // 9 colors for 9 data entries
+    // 10 colors for 10 data entries
     val colors = listOf(
-        Purple40, PurpleGrey40, Purple80, PurpleGrey80, Teal200, Pink40, Pink80, Blue200, Blue80
+        Purple40, PurpleGrey40, Purple80, PurpleGrey80, Teal40, Teal200, Pink40, Pink80, Blue200, Blue80
     )
 
     // to play the animation only once when the function is Created or Recomposed
@@ -78,7 +84,7 @@ fun ReasonPieChart(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top=40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Pie Chart using Canvas Arc
@@ -94,7 +100,7 @@ fun ReasonPieChart(
                     .rotate(animateRotation)
             ) {
                 // draw each Arc for each data entry in Pie Chart
-                floatValue.forEachIndexed { index, value ->
+                degrees.forEachIndexed { index, value ->
                     drawArc(
                         color = colors[index],
                         lastValue,
@@ -107,7 +113,7 @@ fun ReasonPieChart(
             }
         }
 
-        DetailsPieChart(data = originalData, colors = colors)
+        DetailsPieChart(data = data, colors = colors)
 
     }
 }
@@ -115,8 +121,11 @@ fun ReasonPieChart(
 
 @Composable
 fun DetailsPieChart(
-    data: List<Pair<String, Int>>, colors: List<Color>
+    data: List<Pair<String, UsageResult>>, colors: List<Color>
 ) {
+    // get the count for each data entry
+
+
     Column(
         modifier = Modifier
             .padding(top = 40.dp)
@@ -134,7 +143,7 @@ fun DetailsPieChart(
 
 @Composable
 fun DetailsPieChartItem(
-    data: Pair<String, Int>, height: Dp = 45.dp, color: Color
+    data: Pair<String, UsageResult>, height: Dp = 45.dp, color: Color
 ) {
 
     Surface(
@@ -156,11 +165,13 @@ fun DetailsPieChartItem(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     modifier = Modifier.padding(start = 15.dp),
-                    text = data.first
+                    text = data.first,
+                    style = MaterialTheme.typography.labelLarge
                 )
+                val quitFormatter = String.format("%.1f", data.second.prob*100)
                 Text(
                     modifier = Modifier.padding(start = 15.dp),
-                    text = data.second.toString()
+                    text = "${data.second.value} ($quitFormatter%)"
                 )
             }
 
@@ -171,29 +182,29 @@ fun DetailsPieChartItem(
 }
 
 //@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-@Composable
-fun ReasonPieChartPreview() {
-    val originalData = listOf(
-        "Boredom" to 50,
-        "Stress" to 20,
-//        "Tired" to 0,
-        "Procrastination" to 30,
-//        "Anxious" to 0,
-//        "Sad" to 0,
-//        "Can not sleep" to 0,
-//        "Toilet" to 0,
-//        "Reply to messages" to 0
-    )
-    val percentageData = listOf(
-        "Boredom" to 0.5f,
-        "Stress" to 0.2f,
-//        "Tired" to 0f,
-        "Procrastination" to 0.3f,
-//        "Anxious" to 0f,
-//        "Sad" to 0f,
-//        "Can not sleep" to 0f,
-//        "Toilet" to 0f,
-//        "Reply to messages" to 0f
-    )
-    ReasonPieChart(originalData, percentageData)
-}
+//@Composable
+//fun ReasonPieChartPreview() {
+//    val originalData = listOf(
+//        "Boredom" to 50,
+//        "Stress" to 20,
+////        "Tired" to 0,
+//        "Procrastination" to 30,
+////        "Anxious" to 0,
+////        "Sad" to 0,
+////        "Can not sleep" to 0,
+////        "Toilet" to 0,
+////        "Reply to messages" to 0
+//    )
+//    val percentageData = listOf(
+//        "Boredom" to 0.5f,
+//        "Stress" to 0.2f,
+////        "Tired" to 0f,
+//        "Procrastination" to 0.3f,
+////        "Anxious" to 0f,
+////        "Sad" to 0f,
+////        "Can not sleep" to 0f,
+////        "Toilet" to 0f,
+////        "Reply to messages" to 0f
+//    )
+//    ReasonPieChart(originalData, percentageData)
+//}
